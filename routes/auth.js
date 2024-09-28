@@ -1,19 +1,12 @@
-// Import required packages
 const express = require('express');
-const cors = require('cors');
 const bcrypt = require('bcryptjs');  // For password hashing
-const pool = require('./db');  // Assuming db.js handles your PostgreSQL connection
-const { body, validationResult } = require('express-validator');
+const { body, validationResult } = require('express-validator');  // For input validation
+const pool = require('../db');  // Import the database connection
 
-// Initialize Express
-const app = express();
-
-// Middleware
-app.use(cors());  // Enables cross-origin requests
-app.use(express.json());  // Allows parsing JSON request bodies
+const router = express.Router();
 
 // Registration route with validation
-app.post('/register', 
+router.post('/register', 
   [
     body('email').isEmail().withMessage('Please enter a valid email'),
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
@@ -51,24 +44,4 @@ app.post('/register',
   }
 );
 
-// Test database connection route
-app.get('/test-db', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    res.send(result.rows[0]);  // Sends the current time from PostgreSQL
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
-});
-
-// Test route to ensure server is working
-app.get('/', (req, res) => {
-  res.send('Hello from the BoostHabit server!');
-});
-
-// Set the port
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+module.exports = router;  // Export the router to be used in server.js
