@@ -1,12 +1,12 @@
 const { Pool } = require('pg');
 
-// Use your PostgreSQL credentials
+// Set up a connection pool for PostgreSQL
 const pool = new Pool({
-  user: 'postgres',        //  PostgreSQL username
-  password: 'admin',       //  PostgreSQL password
-  host: 'localhost',       //  PostgreSQL server (localhost in this case)
-  port: 5432,              // The port PostgreSQL is running on (5432 is default)
-  database: 'boosthabit'   // The name of  database (boosthabit or postgres)
+  user: process.env.DB_USER || 'postgres',        // Your PostgreSQL username
+  host: process.env.DB_HOST || 'localhost',       // Database host
+  database: process.env.DB_DATABASE || 'boosthabit_db', // Database name
+  password: process.env.DB_PASSWORD || 'adnin', // Database password
+  port: process.env.DB_PORT || 5432,              // PostgreSQL port
 });
 
-module.exports = pool;
+module.exports = pool;  // Export the pool for use in other files
