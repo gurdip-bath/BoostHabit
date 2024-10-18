@@ -11,8 +11,14 @@ router.post('/register',
   [
     // Validate that the email is in a proper format
     body('email').isEmail().withMessage('Please enter a valid email'),
-    // Validate that the password has a minimum length of 6 characters
-    body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')
+    // Enhance password validation with strength requirements
+    body('password').isStrongPassword({
+      minLength: 6,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1
+    }).withMessage('Password must be at least 6 characters long and include lowercase, uppercase, numbers, and symbols')
   ],
   async (req, res) => {
     // Extract validation errors from the request
