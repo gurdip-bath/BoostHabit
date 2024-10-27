@@ -5,7 +5,7 @@ const pool = new Pool({
   user: process.env.DB_USER || 'postgres',        // Your PostgreSQL username
   host: process.env.DB_HOST || 'localhost',       // Database host
   database: process.env.DB_DATABASE || 'boosthabit_db', // Database name
-  password: process.env.DB_PASSWORD || 'adnin', // Database password
+  password: process.env.DB_PASSWORD || 'admin', // Database password
   port: process.env.DB_PORT || 5432,              // PostgreSQL port
 });
 
