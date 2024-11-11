@@ -10,3 +10,11 @@ const pool = new Pool({
 });
 
 module.exports = pool;  // Export the pool for use in other files
+
+pool.connect((err, _, release) => {
+  if (err) {
+    return console.error('Error connecting to database:', err.stack);
+  }
+  console.log('Connected to the database');
+  release(); // Releases the client after connecting
+});

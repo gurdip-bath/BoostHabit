@@ -3,10 +3,12 @@ const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const pool = require('../server/db');
 const jwt = require('jsonwebtoken');
+require('dotenv').config(); 
 
 const router = express.Router();
 
 // Route for user registration
+
 router.post('/register', 
   [
     body('email').isEmail().withMessage('Please enter a valid email'),
@@ -48,6 +50,11 @@ router.post('/register',
     }
   }
 );
+
+router.get('/test', (req, res) => {
+  res.send('Auth route works!');
+});
+
 
 // Route for user login
 router.post('/login', [
@@ -97,7 +104,8 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_key');
+    const actualToken = token.split(' ')[1]; // Extracts the token part after 'Bearer'
+    const decoded = jwt.verify(actualToken, process.env.JWT_SECRET || 'your_jwt_secret_key');
     req.userId = decoded.userId;
     next();
   } catch (err) {
@@ -120,30 +128,64 @@ router.post('/reset-password', async (req, res) => {
       return res.status(400).json({ msg: 'Email not registered' });
     }
 
+    // Generate reset token with a short expiration time (e.g., 15 minutes)
     const resetToken = jwt.sign(
       { userId: user.rows[0].id },
       process.env.JWT_SECRET || 'your_jwt_secret_key',
       { expiresIn: '15m' }
     );
 
-    // Send resetToken to user’s email (using a mailing service like Nodemailer)
-    res.json({ msg: 'Reset token generated', resetToken });
+    // Construct reset link URL to be sent to the user's email
+    const resetLink = `https://yourapp.com/reset-password/${resetToken}`; // !! Adjust URL to match your app
+
+    // Send reset email to the user using Nodemailer
+    await transporter.sendMail({
+      from: '"BoostHabit Support" <support@yourapp.com>', //!! change email to match real life email
+      to: email,
+      subject: 'Password Reset Request',
+      text: `Please click the following link to reset your password: ${resetLink}`,
+      html: `<p>Please click the following link to reset your password:</p><a href="${resetLink}">${resetLink}</a>`,
+    });
+
+    // Send a response confirming that the email was sent
+    res.json({ msg: 'Reset email sent successfully' });
+
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
   }
 });
 
-// Optional: Route for password reset completion (resets password)
-router.post('/reset-password/:token', async (req, res) => {
+
+
+// Route for password reset completion (resets password)
+router.post('/reset-password/:token', [
+  // Password validation middleware
+  body('newPassword').isStrongPassword({
+    minLength: 6,
+    minLowercase: 1,
+    minUppercase: 1,
+    minNumbers: 1,
+    minSymbols: 1
+  }).withMessage('Password must be at least 6 characters long and include lowercase, uppercase, numbers, and symbols')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { token } = req.params;
   const { newPassword } = req.body;
 
   try {
+    // Decode and verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_key');
+
+    // Hash the new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
+    // Update the password in the database
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashedPassword, decoded.userId]);
 
     res.status(200).json({ msg: 'Password successfully reset' });
@@ -153,4 +195,20 @@ router.post('/reset-password/:token', async (req, res) => {
   }
 });
 
+
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail', // or any other email provider
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+
+
+
 module.exports = router;
+
+
