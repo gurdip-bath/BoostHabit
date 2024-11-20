@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('../routes/auth');  // Import authentication routes
+const habitsRoutes = require('../routes/habits');  // Add the habit routes
 require('dotenv').config();  // Optional: for environment variables
 const app = express();
 
@@ -10,6 +11,7 @@ app.use(express.json());  // Parses incoming JSON request bodies
 
 // Route middleware
 app.use('/auth', authRoutes);  // Any route starting with /auth goes to auth.js
+app.use('/api/habits', habitsRoutes); //Mounts habits routes at this path 
 
 // Test route to ensure server is working
 app.get('/', (req, res) => {
