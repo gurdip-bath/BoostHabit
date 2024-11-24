@@ -5,11 +5,12 @@ const pool = require('../server/db'); // Assuming you're using PostgreSQL with a
  // CREATE a new habit
 router.post('/', async (req, res) => {
     try {
-        const { name, description, frequency } = req.body;
+        const { name, description, frequency, target_completion } = req.body;
         const newHabit = await pool.query(
-            'INSERT INTO habits (name, description, frequency) VALUES ($1, $2, $3) RETURNING *',
-            [name, description, frequency]
+            'INSERT INTO habits (name, description, frequency, target_completion ) VALUES ($1, $2, $3, $4) RETURNING *',
+            [name, description, frequency, target_completion]
         );
+        console.log('Inserted Habit:', newHabit.rows[0]); // Log the database result
         res.json(newHabit.rows[0]);
     } catch (err) {
         console.error(err.message);
