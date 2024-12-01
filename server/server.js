@@ -11,7 +11,7 @@ app.use(express.json());  // Parses incoming JSON request bodies
 
 // Route middleware
 app.use('/auth', authRoutes);  // Any route starting with /auth goes to auth.js
-app.use('/api/habits', habitsRoutes); //Mounts habits routes at this path 
+app.use('/api/habits', habitsRoutes); // Mounts habits routes at this path 
 
 // Test route to ensure server is working
 app.get('/', (req, res) => {

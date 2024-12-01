@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import HabitCard from '../forms/HabitCard';
 
 
 const Dashboard = () => {
@@ -7,12 +8,13 @@ const Dashboard = () => {
 
 // Step 2: Fetch data using useEffect
   useEffect(() => {
-    fetch('/api/habits') // Replace with your backend route
+    fetch('http://localhost:5000/api/habits') 
       .then(response => response.json())
       .then(data => setHabits(data))
       .catch(error => console.error('Error fetching habits:', error));
   }, []);
 
+// Step 3: Render the Data
   return (
     <div>
       <h1>Dashboard</h1>
