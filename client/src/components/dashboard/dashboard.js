@@ -5,6 +5,7 @@ import "../../styles/dashboard.css"
 
 const Dashboard = () => {
   const [habits, setHabits] = useState([]);
+  const [newHabit, setNewHabit] = useState('');
   useEffect(() => {
     fetch('http://localhost:5000/api/habits') 
       .then(response => response.json())
