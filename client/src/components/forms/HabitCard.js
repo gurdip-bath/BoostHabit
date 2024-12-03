@@ -6,8 +6,8 @@ const HabitCard = ({ habit }) => {
     <div className="habit-card">
       <h2 className='habit-title'>{habit.name}</h2>
       <p className="habit-description">{habit.description}</p>
-      <p>Current Streak: {habit.current_streak} days</p>
-      <p>Longest Streak: {habit.longest_streak} days</p>
+      <p className= "current-streak">Current Streak: {habit.current_streak} days</p>
+      <p className= "longest-streak">Longest Streak: {habit.longest_streak} days</p>
     </div>
   );
 };
