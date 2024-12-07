@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HabitCard from '../forms/HabitCard';
-import "../../styles/dashboard.css";
+
 
 const Dashboard = () => {
   const [habits, setHabits] = useState([]); // State to store habits
@@ -30,11 +30,11 @@ const Dashboard = () => {
     fetch('http://localhost:5000/api/habits', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-          name: newHabit,
-          frequency: "daily",
-          target_completion: 5, }) // Send the habit name to the server
-      
+      body: JSON.stringify({
+        name: newHabit,
+        frequency: "daily",
+        target_completion: 5, // Example additional field
+      }),
     })
       .then(response => response.json())
       .then(data => {
@@ -45,8 +45,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div>
-      <h1 className='dashboard-title'>Dashboard</h1>
+    <div className="dashboard">
+      <h1 className="dashboard-title">Dashboard</h1>
       <div className="add-habit-container">
         <input
           type="text"
@@ -59,11 +59,15 @@ const Dashboard = () => {
           Add Habit
         </button>
       </div>
-      {habits.length > 0 ? (
-        habits.map(habit => <HabitCard key={habit.id} habit={habit} />)
-      ) : (
-        <p>No habits to display.</p>
-      )}
+      <div className="habit-list">
+        {habits.length > 0 ? (
+          habits.map(habit => (
+            <HabitCard key={habit.id} habit={habit} className="habit-card" />
+          ))
+        ) : (
+          <p className="no-habits-message">No habits to display.</p>
+        )}
+      </div>
     </div>
   );
 };
