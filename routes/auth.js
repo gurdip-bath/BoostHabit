@@ -28,6 +28,8 @@ router.post('/register',
 
     const { email, password } = req.body;
 
+
+
     try {
       const userExists = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
       if (userExists.rows.length > 0) {

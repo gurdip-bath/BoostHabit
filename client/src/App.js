@@ -9,3 +9,6 @@ function App() {
 }
 
 export default App;
+
+
+// COMPLETE STEP 4 IN THE DEFINE SCHEME FOR PROGRESS TRACKING IN THE DATABASE PLAN
