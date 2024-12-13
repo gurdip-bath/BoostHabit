@@ -11,4 +11,8 @@ function App() {
 export default App;
 
 
-// COMPLETE STEP 5 IN THE DEFINE SCHEME FOR PROGRESS TRACKING IN THE DATABASE PLAN
+/* COMPLETE FOLLOWING TASK: Backend Logic
+Mini Tasks:
+Define API endpoints for progress tracking inside
+habitprogress.js file : */ 
+
