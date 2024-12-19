@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../server/db'); // Assuming you're using PostgreSQL with a connection pool
+const pool = require('../server/db'); 
 
  // CREATE a new habit
 router.post('/', async (req, res) => {
@@ -77,5 +77,7 @@ router.delete('/:id', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+
 
 module.exports = router;
