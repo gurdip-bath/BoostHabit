@@ -14,5 +14,6 @@ export default App;
 /* COMPLETE FOLLOWING TASK: Backend Logic
 Mini Tasks:
 Define API endpoints for progress tracking inside
-habitprogress.js file : */ 
+habitprogress.js file
+. go back to habitprogress file and create API : */ 
 
