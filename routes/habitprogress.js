@@ -39,3 +39,6 @@ router.post('/', async (req, res) => {
         res.status(500).send('Server Error');
     }
 });
+
+// FETCH progress details for habits 
+router.get('/', async (req, res))
