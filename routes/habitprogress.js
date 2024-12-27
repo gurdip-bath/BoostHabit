@@ -62,4 +62,22 @@ router.get('/:habit_id', async (req, res) => {
     }
 });
 
+// PUT request to update the progress of a habit
+router.put('/:habit_id', async(req, res) => {
+    try {
+        const { id } = req.params;
+        const { habit_id, completion_date, completion_count, current_streak, longest_streak } = req.body;
+        const updatedHabitProgress = await pool.query (
+            'UPDATE habits_progress SET completion_count = $1, current_streak = $2, completion_date = $3, habit_id = $4 RETURNING * ',
+            [completion_count, current_streak, completion_date, habit_id]
+        );
+        if (updatedHabitProgress.rows.length === 0) {
+            return res.status(404).json({ message: 'Habit not found' });
+        }
+        res.json(updatedHabitProgress.rows[0]);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error')
+    }
+});
 
