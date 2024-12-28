@@ -1,5 +1,5 @@
 const express = require ('express');
-const router = express.router();
+const router = express.Router();
 const pool = require('../server/db');
 
 // CREATE a new progress entry for a specific habit
@@ -47,37 +47,89 @@ router.get('/:habit_id', async (req, res) => {
 
         // Query the database to fetch progress entries for the specified habit_id
         const habitProgress = await pool.query(
-            'SELECT * FROM habit_progress WHERE habit_id = $1', // Use parameterized query to prevent SQL injection
+            'SELECT * FROM habit_progress WHERE habit_id = $1', 
             [habit_id]
         );
 
         // Send the retrieved data as a JSON response with a status of 200 (OK)
         res.status(200).json(habitProgress.rows);
     } catch (err) {
-        // Log the error message to the console for debugging purposes
         console.error('Error retrieving habit progress:', err.message);
-
-        // Respond with a 500 status code indicating a server error
         res.status(500).send('Failed to retrieve habit progress from the database.');
     }
 });
 
-// PUT request to update the progress of a habit
-router.put('/:habit_id', async(req, res) => {
+// Define a PUT endpoint to update habit progress for a specific habit based on its ID
+router.put('/:habit_id', async (req, res) => {
     try {
-        const { id } = req.params;
-        const { habit_id, completion_date, completion_count, current_streak, longest_streak } = req.body;
-        const updatedHabitProgress = await pool.query (
-            'UPDATE habits_progress SET completion_count = $1, current_streak = $2, completion_date = $3, habit_id = $4 RETURNING * ',
-            [completion_count, current_streak, completion_date, habit_id]
-        );
-        if (updatedHabitProgress.rows.length === 0) {
-            return res.status(404).json({ message: 'Habit not found' });
+        const { habit_id } = req.params;
+        // Extract fields to update from the request body
+        const { completion_date, completion_count, current_streak, longest_streak } = req.body;
+
+        // Validate request body fields
+        if (!completion_date || !completion_count || current_streak === undefined || longest_streak === undefined) {
+            return res.status(400).json({ error: 'All fields (completion_date, completion_count, current_streak, longest_streak) are required.' });
         }
-        res.json(updatedHabitProgress.rows[0]);
+
+        // Query the database to update the specified habit progress record
+        const updatedHabitProgress = await pool.query(
+            `UPDATE habit_progress 
+            SET 
+                completion_count = $1, 
+                current_streak = $2, 
+                longest_streak = $3, 
+                completion_date = $4 
+            WHERE habit_id = $5 
+            RETURNING *`, // Return the updated record to confirm changes
+            [completion_count, current_streak, longest_streak, completion_date, habit_id]
+        );
+
+        // Check if no rows were affected, meaning the habit_id doesn't exist
+        if (updatedHabitProgress.rows.length === 0) {
+            return res.status(404).json({ message: 'Habit progress not found.' });
+        }
+
+        // Send the updated habit progress record as a JSON response
+        res.status(200).json(updatedHabitProgress.rows[0]);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error')
+        // Log the error message to the console for debugging purposes
+        console.error('Error updating habit progress:', err.message);
+
+        // Respond with a 500 status code indicating a server error
+        res.status(500).send('Server Error');
     }
 });
 
+
+// Define a DELETE endpoint to delete a habit progress entry by habit_id
+router.delete('/:habit_id', async (req, res) => {
+    try {
+        // Extract the habit_id from the request parameters
+        const { habit_id } = req.params;
+
+        // Execute the SQL query to delete the habit progress entry
+        const deleteHabitProgress = await pool.query(
+            'DELETE FROM habit_progress WHERE habit_id = $1 RETURNING *', // Use habit_id to identify the record
+            [habit_id] // Pass the habit_id as a parameter
+        );
+
+        // Check if no rows were affected, meaning the habit_id doesn't exist
+        if (deleteHabitProgress.rows.length === 0) {
+            return res.status(404).json({ message: 'Habit progress not found.' });
+        }
+
+        // Send a success message with details of the deleted record
+        res.status(200).json({
+            message: 'Habit progress deleted successfully.',
+            deleted: deleteHabitProgress.rows[0] // Include the deleted record in the response
+        });
+    } catch (err) {
+        // Log the error message to the console for debugging purposes
+        console.error('Error deleting habit progress:', err.message);
+
+        // Respond with a 500 status code indicating a server error
+        res.status(500).send('Failed to delete habit progress.');
+    }
+});
+
+module.exports = router;
