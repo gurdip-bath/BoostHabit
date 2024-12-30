@@ -13,7 +13,5 @@ export default App;
 
 /* COMPLETE FOLLOWING TASK: Backend Logic
 Mini Tasks:
-Define API endpoints for progress tracking inside
-habitprogress.js file
-. go back to habitprogress file and create API : */ 
+Add middleware for validation (e.g., ensuring valid date input)*/ 
 
