@@ -4,7 +4,7 @@ const pool = require('../server/db');
 const [validateHabitProgress] = require('../middleware/validation')
 
 // CREATE a new progress entry for a specific habit
-router.post('/', async (req, res) => {
+router.post('/', validateHabitProgress , async (req, res) => {
     try {
         // Step 1: Destructure the required fields from the request body
         const { habit_id, completion_date, completion_count, current_streak, longest_streak } = req.body;
