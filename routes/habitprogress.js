@@ -61,7 +61,7 @@ router.get('/:habit_id', async (req, res) => {
 });
 
 // Define a PUT endpoint to update habit progress for a specific habit based on its ID
-router.put('/:habit_id', async (req, res) => {
+router.put('/:habit_id', validateHabitProgress ,async (req, res) => {
     try {
         const { habit_id } = req.params;
         // Extract fields to update from the request body
