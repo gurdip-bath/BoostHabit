@@ -1,7 +1,7 @@
 const express = require ('express');
 const router = express.Router();
 const pool = require('../server/db');
-const [validateHabitProgress] = require('../middleware/validation')
+const {validateHabitProgress} = require('../middleware/validation')
 
 // CREATE a new progress entry for a specific habit
 router.post('/', validateHabitProgress , async (req, res) => {
