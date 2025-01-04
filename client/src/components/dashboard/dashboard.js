@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import HabitCard from '../forms/HabitCard';
+import HabitCard from '../habitcard/HabitCard';
 
 
 const Dashboard = () => {
