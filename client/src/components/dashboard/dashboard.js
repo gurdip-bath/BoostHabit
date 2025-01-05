@@ -43,6 +43,7 @@ const Dashboard = () => {
       })
       .catch(error => console.error('Error adding habit:', error));
   };
+// Function to handle marking a habit as completed
 
   return (
     <div className="dashboard">
