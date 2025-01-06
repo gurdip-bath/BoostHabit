@@ -39,5 +39,5 @@ const HabitCard = ({ habit, handleComplete }) => {
   );
 };
 
-// Export the HabitCard component so it can be used in other parts of the application
+
 export default HabitCard;

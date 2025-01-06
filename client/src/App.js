@@ -13,5 +13,6 @@ export default App;
 
 /* COMPLETE FOLLOWING TASK: Backend Logic
 Mini Tasks:
-Add middleware for validation (e.g., ensuring valid date input)*/ 
+complete PATCH request in habits.js file for 
+completed button so it can update the backend )*/ 
 
