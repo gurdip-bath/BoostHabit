@@ -81,6 +81,9 @@ router.delete('/:id', async (req, res) => {
 // PATCH: Mark a habit as completed
 
 router.patch('/:id/complete', async (req, rest) => {
+    try {
+        const { id } = req.params
+    }
     
 })
 
