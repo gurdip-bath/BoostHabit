@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HabitCard from '../habitcard/HabitCard';
 
-
 const Dashboard = () => {
   const [habits, setHabits] = useState([]); // State to store habits
   const [newHabit, setNewHabit] = useState(''); // State to manage input value for a new habit
@@ -43,7 +42,25 @@ const Dashboard = () => {
       })
       .catch(error => console.error('Error adding habit:', error));
   };
-// Function to handle marking a habit as completed
+
+  // Function to handle marking a habit as completed
+  const handleComplete = (habitId) => {
+    // Update the backend
+    fetch(`http://localhost:5000/api/habits/${habitId}/complete`, {
+      method: 'PATCH', // Assuming PATCH is used to update the habit's status
+      headers: { 'Content-Type': 'application/json' },
+    })
+      .then(response => response.json())
+      .then((updatedHabit) => {
+        // Update the state with the updated habit
+        setHabits((prevHabits) =>
+          prevHabits.map((habit) =>
+            habit.id === habitId ? updatedHabit : habit
+          )
+        );
+      })
+      .catch((error) => console.error('Error completing habit:', error));
+  };
 
   return (
     <div className="dashboard">
@@ -62,8 +79,13 @@ const Dashboard = () => {
       </div>
       <div className="habit-list">
         {habits.length > 0 ? (
-          habits.map(habit => (
-            <HabitCard key={habit.id} habit={habit} className="habit-card" />
+          habits.map((habit) => (
+            <HabitCard
+              key={habit.id}
+              habit={habit}
+              handleComplete={handleComplete} // Pass handleComplete as a prop
+              className="habit-card"
+            />
           ))
         ) : (
           <p className="no-habits-message">No habits to display.</p>
@@ -72,5 +94,8 @@ const Dashboard = () => {
     </div>
   );
 };
+
+
+
 
 export default Dashboard;
