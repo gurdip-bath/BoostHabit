@@ -80,12 +80,33 @@ router.delete('/:id', async (req, res) => {
 
 // PATCH: Mark a habit as completed
 
-router.patch('/:id/complete', async (req, rest) => {
+// PATCH: Mark a habit as completed
+router.patch('/:id/complete', async (req, res) => {
     try {
-        const { id } = req.params
+        const { id } = req.params;
+
+        // Update the completed status or related fields (e.g., current_streak, last_completed)
+        const updatedHabit = await pool.query(
+            `UPDATE habits 
+             SET completed = true, 
+                 current_streak = current_streak + 1, 
+                 last_completed = NOW() 
+             WHERE id = $1 
+             RETURNING *`,
+            [id]
+        );
+
+        if (updatedHabit.rows.length === 0) {
+            return res.status(404).json({ message: 'Habit not found' });
+        }
+
+        res.json(updatedHabit.rows[0]); // Return the updated habit
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
     }
-    
-})
+});
+
 
 
 module.exports = router;
