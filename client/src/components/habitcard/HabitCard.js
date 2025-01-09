@@ -9,7 +9,8 @@ import "../../styles/habit-card.css";
 const HabitCard = ({ habit, handleComplete }) => {
   return (
     // Main container for the habit card with a class name for styling
-    <div className="habit-card">
+    <div className={`habit-card ${habit.completed ? "completed" : ""}`}>
+
 
       {/* Display the name of the habit as a heading */}
       <h2 className="habit-title">{habit.name}</h2>
