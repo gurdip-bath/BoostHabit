@@ -86,8 +86,8 @@ router.patch('/:id/complete', async (req, res) => {
 
         // Update the completed status or related fields (e.g., current_streak, last_completed)
         const updatedHabit = await pool.query(
-            `UPDATE habits 
-             SET completed = true, 
+            `UPDATE habits
+             SET complete = true, 
                  current_streak = current_streak + 1, 
                  last_completed = NOW() 
              WHERE id = $1 

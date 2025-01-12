@@ -31,7 +31,6 @@ const HabitCard = ({ habit, handleComplete }) => {
         // Disable the button if the habit is already completed
         disabled={habit.completed}
         // Set the background color based on whether the habit is completed or not
-        style={{ backgroundColor: habit.completed ? "grey" : "blue" }}
       >
         {/* Change the button text dynamically based on whether the habit is completed */}
         {habit.completed ? "Completed" : "Mark as Completed"}
