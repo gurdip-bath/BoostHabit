@@ -93,8 +93,8 @@ router.patch('/:id/complete', async (req, res) => {
                 last_completed = NOW(),
                 experience_points = experience_points + 5,
                 level = (experience_points / 50) + 1,
-                longest_streak = GREATEST(longest_streak, current_streak),
-            WHERE id = $1
+                longest_streak = GREATEST(longest_streak, current_streak)
+            WHERE id = 1
             RETURNING *`,
             [id]
         );
