@@ -4,8 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node server/server.js",
-    "dev": "nodemon server/server.js",
+    "start": "concurrently \"npm run start-client\" \"npm run start-server\"",
+    "start-client": "npm --prefix client start",
+    "start-server": "nodemon server/server.js",
+    "dev": "concurrently \"npm run dev-server\" \"npm run start-client\"",
+    "dev-server": "nodemon server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -23,6 +26,7 @@
     "pg": "^8.13.0"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "nodemon": "^2.0.22"
   }
 }
