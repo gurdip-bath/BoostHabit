@@ -2,21 +2,50 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../server/db'); 
 
- // CREATE a new habit
+// CREATE a new habit
 router.post('/', async (req, res) => {
     try {
+        // Destructure the required fields from the request body
         const { name, description, frequency, target_completion } = req.body;
+
+        // Validate required fields
+        if (!name || !frequency || target_completion === undefined) {
+            return res.status(400).json({
+                error: 'Name, frequency, and target_completion are required fields.',
+            });
+        }
+
+        // Insert the new habit into the database
         const newHabit = await pool.query(
-            'INSERT INTO habits (name, description, frequency, target_completion ) VALUES ($1, $2, $3, $4) RETURNING *',
-            [name, description, frequency, target_completion]
+            `INSERT INTO habits 
+            (name, description, frequency, target_completion) 
+            VALUES ($1, $2, $3, $4) 
+            RETURNING *`,
+            [name, description || null, frequency, target_completion]
         );
-        console.log('Inserted Habit:', newHabit.rows[0]); // Log the database result
-        res.json(newHabit.rows[0]);
+
+        // Log the inserted habit for debugging
+        console.log('Inserted Habit:', newHabit.rows[0]);
+
+        // Return the newly created habit
+        res.status(201).json(newHabit.rows[0]);
     } catch (err) {
-        console.error(err.message);
+        // Log the error
+        console.error('Error inserting habit:', err.message);
+
+        // Handle potential database errors
+        if (err.code === '23502') { // NOT NULL violation
+            return res.status(400).json({
+                error: 'A required field is missing or invalid.',
+            });
+        }
+
+        // General error response
         res.status(500).send('Server Error');
     }
 });
+
+
 
 // READ all habits
 router.get('/', async (req, res) => {
@@ -94,7 +123,7 @@ router.patch('/:id/complete', async (req, res) => {
                 experience_points = experience_points + 5,
                 level = (experience_points / 50) + 1,
                 longest_streak = GREATEST(longest_streak, current_streak)
-            WHERE id = 1
+            WHERE id = $1
             RETURNING *`,
             [id]
         );

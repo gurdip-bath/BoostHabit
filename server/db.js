@@ -15,8 +15,6 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-module.exports = pool;  // Export the pool for use in other files
-
 pool.connect((err, _, release) => {
   if (err) {
     return console.error('Error connecting to database:', err.stack);
@@ -24,3 +22,6 @@ pool.connect((err, _, release) => {
   console.log('Connected to the database');
   release(); // Releases the client after connecting
 });
+
+module.exports = pool;  // Export the pool for use in other files
+
