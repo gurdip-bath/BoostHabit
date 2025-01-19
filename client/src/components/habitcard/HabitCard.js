@@ -24,6 +24,7 @@ const HabitCard = ({ habit, handleComplete }) => {
       {/* Show the longest streak of the habit */}
       <p className="longest-streak">Longest Streak: {habit.longest_streak} days</p>
 
+      <p className="experience-points">Experience: {habit.experience_points}</p>
       {/* Button to mark the habit as completed */}
       <button 
         // When the button is clicked, call the `handleComplete` function with the habit's ID as an argument
