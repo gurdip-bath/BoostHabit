@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../server/db'); 
+const { updateHabitProgress } = require ('../routes/progressHelpers');
 
 // CREATE a new habit
 router.post('/', async (req, res) => {
@@ -113,28 +114,18 @@ router.patch('/:id/complete', async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Update the completed status or related fields (e.g., current_streak, last_completed)
-        const updatedHabit = await pool.query(
-            `UPDATE habits
-            SET 
-                complete = true,
-                current_streak = current_streak + 1,
-                last_completed = NOW(),
-                experience_points = experience_points + 5,
-                level = (experience_points / 50) + 1,
-                longest_streak = GREATEST(longest_streak, current_streak)
-            WHERE id = $1
-            RETURNING *`,
-            [id]
-        );
+        // Helper function to update habit progress
+        const updatedProgress = await updateHabitProgress(id);
 
-        if (updatedHabit.rows.length === 0) {
-            return res.status(404).json({ message: 'Habit not found' });
-        }
-
-        res.json(updatedHabit.rows[0]); // Return the updated habit
+        // Respond with the updated habit progress
+        res.json(updatedProgress);
     } catch (err) {
-        console.error(err.message);
+        console.error('Error marking habit as completed:', err.message);
+
+        // Handles errors from the helper function
+        if (err.message === 'Habit progress not found') {
+            return res.status(404).json({ message: err.message})
+        }
         res.status(500).send('Server Error');
     }
 });
