@@ -1,17 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { HabitContext } from './context/habitcontext'; 
 import HabitCard from '../habitcard/HabitCard';
 
 const Dashboard = () => {
-  const [habits, setHabits] = useState([]); // State to store habits
-  const [newHabit, setNewHabit] = useState(''); // State to manage input value for a new habit
+  const { habits, fetchHabits, updateHabitProgress } = useContext(HabitContext); // Access context values
+  const [newHabit, setNewHabit] = useState(''); // Local state to manage input for a new habit
 
-  // Fetch habits from the backend on component mount
+  // Fetch habits from context when the component mounts
   useEffect(() => {
-    fetch('http://localhost:5000/api/habits')
-      .then(response => response.json())
-      .then(data => setHabits(data))
-      .catch(error => console.error('Error fetching habits:', error));
-  }, []);
+    fetchHabits(); // Fetch habits using the context function
+  }, [fetchHabits]);
 
   // Function to handle text input change
   const handleInputChange = (e) => {
@@ -31,35 +29,16 @@ const Dashboard = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: newHabit,
-        frequency: "daily",
+        frequency: 'daily',
         target_completion: 5, // Example additional field
       }),
     })
-      .then(response => response.json())
-      .then(data => {
-        setHabits([...habits, data]); // Add the new habit to the existing list
+      .then((response) => response.json())
+      .then((data) => {
+        fetchHabits(); // Refresh habits by fetching the latest data
         setNewHabit(''); // Clear the input field
       })
-      .catch(error => console.error('Error adding habit:', error));
-  };
-
-  // Function to handle marking a habit as completed
-  const handleComplete = (habitId) => {
-    // Update the backend
-    fetch(`http://localhost:5000/api/habits/${habitId}/complete`, {
-      method: 'PATCH', // Assuming PATCH is used to update the habit's status
-      headers: { 'Content-Type': 'application/json' },
-    })
-      .then(response => response.json())
-      .then((updatedHabit) => {
-        // Update the state with the updated habit
-        setHabits((prevHabits) =>
-          prevHabits.map((habit) =>
-            habit.id === habitId ? updatedHabit : habit
-          )
-        );
-      })
-      .catch((error) => console.error('Error completing habit:', error));
+      .catch((error) => console.error('Error adding habit:', error));
   };
 
   return (
@@ -83,7 +62,7 @@ const Dashboard = () => {
             <HabitCard
               key={habit.id}
               habit={habit}
-              handleComplete={handleComplete} // Pass handleComplete as a prop
+              handleComplete={updateHabitProgress} // Use context function to update progress
               className="habit-card"
             />
           ))
@@ -94,8 +73,5 @@ const Dashboard = () => {
     </div>
   );
 };
-
-
-
 
 export default Dashboard;
