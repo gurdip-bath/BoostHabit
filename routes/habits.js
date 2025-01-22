@@ -6,10 +6,8 @@ const { updateHabitProgress } = require ('../routes/progressHelpers');
 // CREATE a new habit
 router.post('/', async (req, res) => {
     try {
-        // Destructure the required fields from the request body
         const { name, description, frequency, target_completion } = req.body;
 
-        // Validate required fields
         if (!name || !frequency || target_completion === undefined) {
             return res.status(400).json({
                 error: 'Name, frequency, and target_completion are required fields.',
@@ -25,23 +23,18 @@ router.post('/', async (req, res) => {
             [name, description || null, frequency, target_completion]
         );
 
-        // Log the inserted habit for debugging
-        console.log('Inserted Habit:', newHabit.rows[0]);
+        const habitId = newHabit.rows[0].id;
 
-        // Return the newly created habit
-        res.status(201).json(newHabit.rows[0]);
+        // Automatically create a habit_progress entry
+        await pool.query(
+            `INSERT INTO habit_progress (habit_id, completion_date, completion_count, current_streak, longest_streak)
+             VALUES ($1, NOW(), 0, 0, 0)`,
+            [habitId]
+        );
+
+        res.status(201).json(newHabit.rows[0]); // Return the newly created habit
     } catch (err) {
-        // Log the error
         console.error('Error inserting habit:', err.message);
-
-        // Handle potential database errors
-        if (err.code === '23502') { // NOT NULL violation
-            return res.status(400).json({
-                error: 'A required field is missing or invalid.',
-            });
-        }
-
-        // General error response
         res.status(500).send('Server Error');
     }
 });
@@ -112,23 +105,28 @@ router.delete('/:id', async (req, res) => {
 // PATCH: Mark a habit as completed
 router.patch('/:id/complete', async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Helper function to update habit progress
-        const updatedProgress = await updateHabitProgress(id);
-
-        // Respond with the updated habit progress
-        res.json(updatedProgress);
+      const { id } = req.params;
+      const updatedHabit = await pool.query(
+        `UPDATE habits
+         SET current_streak = current_streak + 1, 
+             longest_streak = GREATEST(longest_streak, current_streak + 1),
+             experience_points = experience_points + 5
+         WHERE id = $1 
+         RETURNING *`, 
+        [id]
+      );
+  
+      if (updatedHabit.rows.length === 0) {
+        return res.status(404).json({ message: 'Habit not found' });
+      }
+  
+      res.json(updatedHabit.rows[0]);
     } catch (err) {
-        console.error('Error marking habit as completed:', err.message);
-
-        // Handles errors from the helper function
-        if (err.message === 'Habit progress not found') {
-            return res.status(404).json({ message: err.message})
-        }
-        res.status(500).send('Server Error');
+      console.error('Error updating habit:', err.message);
+      res.status(500).json({ message: 'Server Error' });
     }
-});
+  });
+
 
 
 
