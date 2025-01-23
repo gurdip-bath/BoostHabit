@@ -12,8 +12,3 @@ function App() {
 export default App;
 
 
-/* COMPLETE FOLLOWING TASK: Backend Logic
-Mini Tasks:
-complete PATCH request in habits.js file for 
-completed button so it can update the backend )*/ 
-
