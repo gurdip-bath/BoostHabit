@@ -105,27 +105,42 @@ router.delete('/:id', async (req, res) => {
 // PATCH: Mark a habit as completed
 router.patch('/:id/complete', async (req, res) => {
     try {
-      const { id } = req.params;
-      const updatedHabit = await pool.query(
-        `UPDATE habits
-         SET current_streak = current_streak + 1, 
-             longest_streak = GREATEST(longest_streak, current_streak + 1),
-             experience_points = experience_points + 5
-         WHERE id = $1 
-         RETURNING *`, 
-        [id]
-      );
-  
-      if (updatedHabit.rows.length === 0) {
-        return res.status(404).json({ message: 'Habit not found' });
-      }
-  
-      res.json(updatedHabit.rows[0]);
+        const { id } = req.params;
+        
+        // Start a database transaction to ensure both updates succeed or fail together
+        const client = await pool.connect();
+        
+        try {
+            await client.query('BEGIN');
+            
+            // Update the habit's basic metrics
+            const updatedHabit = await client.query(
+                `UPDATE habits
+                 SET current_streak = current_streak + 1, 
+                     longest_streak = GREATEST(longest_streak, current_streak + 1),
+                     experience_points = experience_points + 5
+                 WHERE id = $1 
+                 RETURNING *`, 
+                [id]
+            );
+
+            // Update the detailed progress tracking
+            await updateHabitProgress(id);
+
+            await client.query('COMMIT');
+            
+            res.json(updatedHabit.rows[0]);
+        } catch (err) {
+            await client.query('ROLLBACK');
+            throw err;
+        } finally {
+            client.release();
+        }
     } catch (err) {
-      console.error('Error updating habit:', err.message);
-      res.status(500).json({ message: 'Server Error' });
+        console.error('Error updating habit:', err.message);
+        res.status(500).json({ message: 'Server Error' });
     }
-  });
+});
 
 
 
