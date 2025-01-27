@@ -4,6 +4,7 @@ import HabitCard from '../habitcard/HabitCard';
 const Dashboard = () => {
   const [habits, setHabits] = useState([]); // State to store habits
   const [newHabit, setNewHabit] = useState(''); // State for new habit input
+  const [progressData, setProgressData] = useState({}); // State for progress data
 
   // Fetch habits from the backend on component mount
   useEffect(() => {
