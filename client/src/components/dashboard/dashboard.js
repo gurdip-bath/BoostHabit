@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import HabitCard from '../habitcard/HabitCard';
 import Notification from '../notification/Notification';
+import HabitForm from '../habitform/HabitForm';
 
 const Dashboard = () => {
   const [habits, setHabits] = useState([]);
-  const [newHabit, setNewHabit] = useState('');
   const [notification, setNotification] = useState({ message: '', type: '' });
 
   useEffect(() => {
@@ -34,39 +34,15 @@ const Dashboard = () => {
     }
   };
 
-  const addHabit = async () => {
-    if (newHabit.trim() === '') {
-      setNotification({
-        message: 'Habit name cannot be empty',
-        type: 'error'
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch('http://localhost:5000/api/habits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: newHabit,
-          frequency: 'daily',
-          target_completion: 5,
-        }),
-      });
-      const data = await response.json();
-      setHabits([...habits, data]);
-      setNewHabit('');
-      setNotification({
-        message: 'New habit added successfully!',
-        type: 'success'
-      });
-    } catch (error) {
-      setNotification({
-        message: 'Failed to add habit',
-        type: 'error'
-      });
-    }
-  };
+  <HabitForm onSubmit={async (formData) => {
+    const response = await fetch('http://localhost:5000/api/habits', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    const data = await response.json();
+    setHabits([...habits, data]);
+  }} />
 
   const handleComplete = async (habitId) => {
     try {
@@ -105,18 +81,29 @@ const Dashboard = () => {
     <div className="dashboard">
       <Notification {...notification} />
       <h1 className="dashboard-title">Dashboard</h1>
-      <div className="add-habit-container">
-        <input
-          type="text"
-          value={newHabit}
-          onChange={(e) => setNewHabit(e.target.value)}
-          placeholder="Enter a new habit"
-          className="add-habit-input"
-        />
-        <button onClick={addHabit} className="add-habit-button">
-          Add Habit
-        </button>
-      </div>
+      
+      {/* Replace the old add-habit-container with HabitForm */}
+      <HabitForm onSubmit={async (formData) => {
+        try {
+          const response = await fetch('http://localhost:5000/api/habits', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+          });
+          const data = await response.json();
+          setHabits([...habits, data]);
+          setNotification({
+            message: 'New habit added successfully!',
+            type: 'success'
+          });
+        } catch (error) {
+          setNotification({
+            message: 'Failed to add habit',
+            type: 'error'
+          });
+        }
+      }} />
+  
       <div className="habit-list">
         {habits.length > 0 ? (
           habits.map((habit) => (
@@ -131,7 +118,6 @@ const Dashboard = () => {
         )}
       </div>
     </div>
-  );
-};
+  ); }
 
 export default Dashboard;
