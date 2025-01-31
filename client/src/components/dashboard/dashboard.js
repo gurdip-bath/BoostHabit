@@ -34,15 +34,40 @@ const Dashboard = () => {
     }
   };
 
-  <HabitForm onSubmit={async (formData) => {
-    const response = await fetch('http://localhost:5000/api/habits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    const data = await response.json();
-    setHabits([...habits, data]);
-  }} />
+  const handleHabitSubmit = async (formData) => {
+    try {
+      console.log('Submitting habit data:', formData); // Debug log
+      
+      const response = await fetch('http://localhost:5000/api/habits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          frequency: Number(formData.frequency),
+          target_completion: Number(formData.target_completion)
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Server error:', errorData);
+        throw new Error('Failed to create habit');
+      }
+
+      const data = await response.json();
+      setHabits([...habits, data]);
+      setNotification({
+        message: 'New habit added successfully!',
+        type: 'success'
+      });
+    } catch (error) {
+      console.error('Error creating habit:', error);
+      setNotification({
+        message: 'Failed to add habit',
+        type: 'error'
+      });
+    }
+  };
 
   const handleComplete = async (habitId) => {
     try {
@@ -82,28 +107,8 @@ const Dashboard = () => {
       <Notification {...notification} />
       <h1 className="dashboard-title">Dashboard</h1>
       
-      {/* Replace the old add-habit-container with HabitForm */}
-      <HabitForm onSubmit={async (formData) => {
-        try {
-          const response = await fetch('http://localhost:5000/api/habits', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData),
-          });
-          const data = await response.json();
-          setHabits([...habits, data]);
-          setNotification({
-            message: 'New habit added successfully!',
-            type: 'success'
-          });
-        } catch (error) {
-          setNotification({
-            message: 'Failed to add habit',
-            type: 'error'
-          });
-        }
-      }} />
-  
+      <HabitForm onSubmit={handleHabitSubmit} />
+
       <div className="habit-list">
         {habits.length > 0 ? (
           habits.map((habit) => (
@@ -118,6 +123,7 @@ const Dashboard = () => {
         )}
       </div>
     </div>
-  ); }
+  );
+};
 
 export default Dashboard;

@@ -1,101 +1,88 @@
-import React, { useState } from 'react';
+// src/components/habitform/HabitForm.js
+import React from 'react';
 import './HabitForm.css';
 
-const HabitForm = ({ onSubmit, initialHabit = null }) => {
-  const [formData, setFormData] = useState({
-    name: initialHabit?.name || '',
-    description: initialHabit?.description || '',
-    frequency: initialHabit?.frequency || 'daily',
-    target_completion: initialHabit?.target_completion || 1
+const HabitForm = ({ onSubmit }) => {
+  const [formData, setFormData] = React.useState({
+    name: '',
+    description: '',
+    frequency: 1,  // Note: integer value
+    target_completion: 1
   });
-  
-  const [errors, setErrors] = useState({});
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.frequency) newErrors.frequency = 'Frequency is required';
-    if (formData.target_completion < 1) newErrors.target_completion = 'Target must be at least 1';
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      try {
-        await onSubmit(formData);
-        // Reset form if it's not editing
-        if (!initialHabit) {
-          setFormData({
-            name: '',
-            description: '',
-            frequency: 'daily',
-            target_completion: 1
-          });
-        }
-      } catch (error) {
-        setErrors({ submit: 'Failed to save habit' });
-      }
+    
+    // Ensure data is properly formatted
+    const submitData = {
+      name: formData.name,
+      description: formData.description,
+      frequency: Number(formData.frequency), // Explicitly convert to number
+      target_completion: Number(formData.target_completion) // Explicitly convert to number
+    };
+
+    console.log('Submitting data:', submitData); // Debug log
+    
+    try {
+      await onSubmit(submitData);
+      // Reset form on success
+      setFormData({
+        name: '',
+        description: '',
+        frequency: 1,
+        target_completion: 1
+      });
+    } catch (error) {
+      console.error('Form submission error:', error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="habit-form">
       <div className="form-group">
-        <label htmlFor="name">Habit Name*</label>
+        <label>Habit Name*</label>
         <input
-          id="name"
           type="text"
           value={formData.name}
           onChange={(e) => setFormData({...formData, name: e.target.value})}
-          className={errors.name ? 'error' : ''}
+          required
         />
-        {errors.name && <span className="error-text">{errors.name}</span>}
       </div>
 
       <div className="form-group">
-        <label htmlFor="description">Description</label>
+        <label>Description</label>
         <textarea
-          id="description"
           value={formData.description}
           onChange={(e) => setFormData({...formData, description: e.target.value})}
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="frequency">Frequency*</label>
+        <label>Frequency*</label>
         <select
-          id="frequency"
           value={formData.frequency}
-          onChange={(e) => setFormData({...formData, frequency: e.target.value})}
-          className={errors.frequency ? 'error' : ''}
+          onChange={(e) => setFormData({...formData, frequency: Number(e.target.value)})}
+          required
         >
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
+          <option value={1}>Daily</option>
+          <option value={7}>Weekly</option>
+          <option value={30}>Monthly</option>
         </select>
-        {errors.frequency && <span className="error-text">{errors.frequency}</span>}
       </div>
 
       <div className="form-group">
-        <label htmlFor="target">Target Completion*</label>
+        <label>Target Completion*</label>
         <input
-          id="target"
           type="number"
           min="1"
           value={formData.target_completion}
-          onChange={(e) => setFormData({...formData, target_completion: parseInt(e.target.value)})}
-          className={errors.target_completion ? 'error' : ''}
+          onChange={(e) => setFormData({...formData, target_completion: Number(e.target.value)})}
+          required
         />
-        {errors.target_completion && <span className="error-text">{errors.target_completion}</span>}
       </div>
 
-      {errors.submit && <div className="error-text">{errors.submit}</div>}
-      
       <button type="submit" className="submit-button">
-        {initialHabit ? 'Update Habit' : 'Create Habit'}
+        Create Habit
       </button>
     </form>
   );
