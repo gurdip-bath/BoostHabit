@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import HabitCard from '../habitcard/HabitCard';
 import Notification from '../notification/Notification';
 import HabitForm from '../habitform/HabitForm';
+import './dashboard.css'
 
 const Dashboard = () => {
   const [habits, setHabits] = useState([]);
@@ -105,7 +106,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <Notification {...notification} />
-      <h1 className="dashboard-title">Dashboard</h1>
+      <h1 className="dashboard-title">BoostHabit</h1>
       
       <HabitForm onSubmit={handleHabitSubmit} />
 

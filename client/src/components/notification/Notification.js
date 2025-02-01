@@ -1,19 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import './Notification.css';
 
 const Notification = ({ message, type }) => {
-  const style = {
-    padding: '10px 20px',
-    borderRadius: '4px',
-    margin: '10px 0',
-    backgroundColor: type === 'success' ? '#4caf50' : '#f44336',
-    color: 'white',
-    position: 'fixed',
-    top: '20px',
-    right: '20px',
-    zIndex: 1000
-  };
+  const [isShowing, setIsShowing] = useState(true);
 
-  return message ? <div style={style}>{message}</div> : null;
+  useEffect(() => {
+    if (message) {
+      setIsShowing(true);
+      const timer = setTimeout(() => setIsShowing(false), 2800);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  if (!message || !isShowing) return null;
+
+  return (
+    <div className={`notification ${type}`} style={isShowing ? {} : { animation: 'slideOut 0.3s ease-out forwards' }}>
+      {message}
+    </div>
+  );
 };
 
 export default Notification;

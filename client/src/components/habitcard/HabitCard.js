@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/habit-card.css';
+import './habit-card.css';
 import HabitLevel from '../habitlevel/HabitLevel';
 
 const HabitCard = ({ habit, handleComplete }) => {

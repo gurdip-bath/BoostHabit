@@ -1,0 +1,29 @@
+:root {
+    --primary: #db4c3f;
+    --primary-light: #ff6b6b;
+    --background: #fafafa;
+    --card: #ffffff;
+    --text: #202020;
+    --text-secondary: #808080;
+    --success: #25b84c;
+  }
+  
+  .dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: var(--background);
+  }
+  
+  .dashboard-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 2rem;
+  }
+  
+  .habit-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
