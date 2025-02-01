@@ -118,7 +118,7 @@ router.patch('/:id/complete', async (req, res) => {
                 `UPDATE habits
                  SET current_streak = current_streak + 1, 
                      longest_streak = GREATEST(longest_streak, current_streak + 1),
-                     experience_points = experience_points + 5
+                     experience_points = experience_points + 100
                  WHERE id = $1 
                  RETURNING *`, 
                 [id]

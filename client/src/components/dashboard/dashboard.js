@@ -92,7 +92,7 @@ const Dashboard = () => {
         )
       );
       setNotification({
-        message: `${updatedHabit.name} completed! +5 XP`,
+        message: `${updatedHabit.name} completed! +100 XP`,
         type: 'success'
       });
     } catch (error) {
