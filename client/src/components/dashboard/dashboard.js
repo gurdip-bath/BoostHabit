@@ -9,6 +9,11 @@ const Dashboard = () => {
   const [habits, setHabits] = useState([]);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
+  const handleNavigate = () => {
+    localStorage.removeItem('token');
+    Navigate('/login');
+  };
+
   useEffect(() => {
     fetchHabits();
   }, []);
