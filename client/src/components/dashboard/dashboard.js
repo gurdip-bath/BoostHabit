@@ -6,12 +6,37 @@ import HabitForm from '../habitform/HabitForm';
 import './dashboard.css'
 
 const Dashboard = () => {
+  const navigate = useNavigate ();
   const [habits, setHabits] = useState([]);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
-  const handleNavigate = () => {
+  const handleLogout = () => {
     localStorage.removeItem('token');
-    Navigate('/login');
+    navigate('/login');
+  };
+
+  const handleDelete = async (habitId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/habits/${habitId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete habit');
+      }
+
+      setHabits(habits.filter(habit => habit.id !== habitId));
+      setNotification({
+        message: 'Habit deleted successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      setNotification({
+        message: 'Failed to delete habit',
+        type: 'error'
+      });
+    }
   };
 
   useEffect(() => {
@@ -112,8 +137,13 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <Notification {...notification} />
-      <h1 className="dashboard-title">BoostHabit</h1>
-      
+        <div className="dashboard-header">
+          <h1 className="dashboard-title">BoostHabit</h1>
+            <button 
+            onClick={handleLogout}
+            className="logout-button">logout
+            </button>
+        </div>      
       <HabitForm onSubmit={handleHabitSubmit} />
 
       <div className="habit-list">
@@ -123,6 +153,7 @@ const Dashboard = () => {
               key={habit.id}
               habit={habit}
               handleComplete={handleComplete}
+              handleDelete={handleDelete}
             />
           ))
         ) : (

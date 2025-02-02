@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Dashboard from './components/dashboard/dashboard';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
+import './styles/global.css';
 
   function App() {
     return (

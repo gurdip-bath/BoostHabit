@@ -2,7 +2,7 @@ import React from 'react';
 import './habit-card.css';
 import HabitLevel from '../habitlevel/HabitLevel';
 
-const HabitCard = ({ habit, handleComplete }) => {
+const HabitCard = ({ habit, handleComplete, handleDelete }) => {
   return (
     <div className={`habit-card ${habit.complete ? 'completed' : ''}`}>
       <h2 className="habit-title">{habit.name}</h2>
@@ -17,6 +17,11 @@ const HabitCard = ({ habit, handleComplete }) => {
         className="complete-button"
       >
         Mark as Completed
+      </button>
+      <button
+        onClick={() => handleDelete(habit.id)}
+        className="delete-button"
+        aria-label="Delete habit"> Delete Habit
       </button>
     </div>
   );
