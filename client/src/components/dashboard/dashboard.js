@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Add this import
+import { useNavigate } from 'react-router-dom';
 import HabitCard from '../habitcard/HabitCard';
 import Notification from '../notification/Notification';
 import HabitForm from '../habitform/HabitForm';
-import './dashboard.css'
+import StatsOverview from './StatsOverview'; // Import the new component
+import './dashboard.css';
 
 const Dashboard = () => {
-  const navigate = useNavigate ();
+  const navigate = useNavigate();
   const [habits, setHabits] = useState([]);
   const [notification, setNotification] = useState({ message: '', type: '' });
 
@@ -15,35 +16,10 @@ const Dashboard = () => {
     navigate('/login');
   };
 
-  const handleDelete = async (habitId) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/habits/${habitId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete habit');
-      }
-
-      setHabits(habits.filter(habit => habit.id !== habitId));
-      setNotification({
-        message: 'Habit deleted successfully',
-        type: 'success'
-      });
-    } catch (error) {
-      setNotification({
-        message: 'Failed to delete habit',
-        type: 'error'
-      });
-    }
-  };
-
   useEffect(() => {
     fetchHabits();
   }, []);
 
-  // Clear notification after 3 seconds
   useEffect(() => {
     if (notification.message) {
       const timer = setTimeout(() => {
@@ -68,8 +44,6 @@ const Dashboard = () => {
 
   const handleHabitSubmit = async (formData) => {
     try {
-      console.log('Submitting habit data:', formData); // Debug log
-      
       const response = await fetch('http://localhost:5000/api/habits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -134,16 +108,45 @@ const Dashboard = () => {
     }
   };
 
+  const handleDelete = async (habitId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/habits/${habitId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete habit');
+      }
+
+      setHabits(habits.filter(habit => habit.id !== habitId));
+      setNotification({
+        message: 'Habit deleted successfully',
+        type: 'success'
+      });
+    } catch (error) {
+      setNotification({
+        message: 'Failed to delete habit',
+        type: 'error'
+      });
+    }
+  };
+
   return (
     <div className="dashboard">
       <Notification {...notification} />
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">BoostHabit</h1>
-            <button 
-            onClick={handleLogout}
-            className="logout-button">logout
-            </button>
-        </div>      
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">BoostHabit</h1>
+        <button 
+          onClick={handleLogout}
+          className="logout-button"
+        >
+          Logout
+        </button>
+      </div>
+
+      <StatsOverview habits={habits} />
+      
       <HabitForm onSubmit={handleHabitSubmit} />
 
       <div className="habit-list">
